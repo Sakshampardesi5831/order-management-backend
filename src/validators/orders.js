@@ -85,3 +85,20 @@ export const validateRequest = (req, res, next) => {
   }
   next();
 };
+
+
+export const updateOrderStatusValidation = [
+  param('id')
+    .notEmpty()
+    .withMessage('Order ID is required')
+    .isUUID()
+    .withMessage('Order ID must be a valid UUID'),
+  
+  body('status')
+    .notEmpty()
+    .withMessage('status is required')
+    .isString()
+    .withMessage('status must be a string')
+    .isIn(['Pending', 'Order Received', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'])
+    .withMessage('status must be one of: Pending, Order Received, Preparing, Out for Delivery, Delivered, Cancelled')
+];

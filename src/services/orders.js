@@ -15,7 +15,7 @@ export const createOrder = async (orderData) => {
       customer_name: customerName,
       address,
       phone,
-      status: status || 'Order Received',
+      status: status || 'Pending',
       total_amount: totalAmount
     };
     
@@ -114,4 +114,23 @@ export const getAllOrdersService = async () => {
   );
   
   return ordersWithItems;
+};
+
+export const updateOrderStatusService = async (id, status) => {
+  const pool = await dbConnection();
+  
+  const updateQuery = `
+    UPDATE orders
+    SET status = $1
+    WHERE id = $2
+    RETURNING *
+  `;
+  
+  const result = await pool.query(updateQuery, [status, id]);
+  
+  if (result.rows.length === 0) {
+    return null;
+  }
+  
+  return result.rows[0];
 };

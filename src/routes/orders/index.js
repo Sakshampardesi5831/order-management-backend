@@ -1,5 +1,5 @@
-import { addOrder, getOrderById, getAllOrders } from "../../controllers/orders/index.js";
-import { createOrderValidation, getOrderByIdValidation, validateRequest } from "../../validators/orders.js";
+import { addOrder, getOrderById, getAllOrders, updateOrderStatus } from "../../controllers/orders/index.js";
+import { createOrderValidation, getOrderByIdValidation, updateOrderStatusValidation, validateRequest } from "../../validators/orders.js";
 
 export const ordersRouter = (app) => {
   app.get("/orders", getAllOrders);
@@ -11,4 +11,8 @@ export const ordersRouter = (app) => {
      createOrderValidation,
       validateRequest,
     addOrder);
+  app.put("/orders/:id",
+     updateOrderStatusValidation,
+      validateRequest,
+       updateOrderStatus);
 };
