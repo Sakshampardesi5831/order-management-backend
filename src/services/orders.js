@@ -88,15 +88,30 @@ export const getOrderByIdService = async (id) => {
 export const getAllOrdersService = async () => {
   const pool = await dbConnection();
   
-  // Get all orders with order items count
+  // Get all orders
   const ordersQuery = `
-    SELECT o.*, COUNT(oi.id) as items_count
-    FROM orders o
-    LEFT JOIN order_items oi ON o.id = oi.order_id
-    GROUP BY o.id
-    ORDER BY o.created_at DESC
+    SELECT * FROM orders
+    ORDER BY created_at DESC
   `;
   const ordersResult = await pool.query(ordersQuery);
   
-  return ordersResult.rows;
+  // Get order items for each order
+  const ordersWithItems = await Promise.all(
+    ordersResult.rows.map(async (order) => {
+      const orderItemsQuery = `
+        SELECT oi.*, mi.name, mi.description, mi.image_url
+        FROM order_items oi
+        JOIN menu_items mi ON oi.menu_item_id = mi.id
+        WHERE oi.order_id = $1
+      `;
+      const orderItemsResult = await pool.query(orderItemsQuery, [order.id]);
+      
+      return {
+        ...order,
+        order_items: orderItemsResult.rows
+      };
+    })
+  );
+  
+  return ordersWithItems;
 };
